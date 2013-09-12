@@ -10,7 +10,7 @@
 
 	class Jigsaw {
 
-		public static function show_admin_notice($text, $class = 'updated'){
+		public static function show_notice($text, $class = 'updated'){
 			add_action( 'admin_notices', function() use ($text, $class){
 				echo '<div class="'.$class.'"><p>'.$text.'</p></div>';
 			});
