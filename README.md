@@ -16,7 +16,7 @@ Jigsaw::add_column('slides', 'preview_image', 'Preview', function($pid){
 ### Add something to the admin bar
 
 ###### `Jigsaw::add_admin_bar_item($label, $url_or_callback_function);`
-```
+```php
 Jigsaw::add_admin_bar_item('Clear Cache', function(){
 	$total_cache->flush_call();
 });
