@@ -15,11 +15,28 @@ Jigsaw::add_column('slides', 'preview_image', 'Preview', function($pid){
 
 ### Add something to the admin bar
 
-###### `Jigsaw::add_admin_bar_item($label, $url_or_callback_function);`
+###### `Jigsaw::add_toolbar_item($label, $url_or_callback_function);`
 ```
-Jigsaw::add_admin_bar_item('Clear Cache', function(){
-	$total_cache->flush_call();
+Jigsaw::add_toolbar_item('Clear Cache', function(){
+	$total_cache->flush_all();
 });
+```
+
+### Add a dropdown
+
+###### `Jigsaw::add_toolbar_group($label, $items);`
+```
+$optionOne = new stdClass();
+$optionOne->label = 'All Caches';
+$optionOne->action = function(){
+	$total_cache->flush_all();
+};
+$optionTwo = new stdClass();
+$optionTwo->label = 'Page Cache';
+$optionTwo->action = function(){
+	$total_cache->flush_page_cache();
+};
+Jigsaw::add_toolbar_group('Clear Cache', array($optionOne, $optionTwo));
 ```
 
 ### Show an admin notice
