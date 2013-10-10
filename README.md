@@ -15,7 +15,6 @@ Jigsaw::add_column('slides', 'Preview', function($pid){
 
 ### Add something to the admin bar
 
-<<<<<<< HEAD
 ###### `Jigsaw::add_toolbar_item($label, $url_or_callback_function);`
 ```
 Jigsaw::add_toolbar_item('Clear Cache', function(){
