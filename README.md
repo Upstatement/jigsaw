@@ -55,7 +55,7 @@ Jigsaw::show_notice('Error flushing cache, is the plugin activated?', 'error');
 
 ### Remove a custom post type permalink
 
-###### 'JigsawPermalinks::remove_permalink_slug($custom_post_type);
+###### `JigsawPermalinks::remove_permalink_slug($custom_post_type)`;
 
 ```php
 JigsawPermalinks::remove_permalink_slug('event');
