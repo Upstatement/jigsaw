@@ -36,7 +36,8 @@ $optionTwo->label = 'Page Cache';
 $optionTwo->action = function(){
 	$total_cache->flush_page_cache();
 };
-Jigsaw::add_toolbar_group('Clear Cache', array($optionOne, $optionTwo));
+$optionThree = array('Home', 'http://localhost');
+Jigsaw::add_toolbar_group('Clear Cache', array($optionOne, $optionTwo, $optionThree));
 ```
 
 ### Show an admin notice
@@ -51,7 +52,24 @@ Jigsaw::show_notice('Cache has been flushed', 'updated');
 Jigsaw::show_notice('Error flushing cache, is the plugin activated?', 'error');
 ```
 
+### Add a CSS file to the admin
+
+###### `Jigsaw::add_css($css_file);`
+
+```php
+Jigsaw::add_css('css/my-admin-style.css');
+```
+
 #JigsawPermalinks
+
+### Set the base of the author permalink
+
+###### `JigsawPermalinks::set_author_base($base_string);`
+
+```php
+JigsawPermalinks::set_author_base('writers');
+```
+After this you have to reset permalinks to see it working.
 
 ### Remove a custom post type permalink
 
@@ -61,7 +79,7 @@ Jigsaw::show_notice('Error flushing cache, is the plugin activated?', 'error');
 JigsawPermalinks::remove_permalink_slug('event');
 ```
 
-or 
+or
 
 ```php
 JigsawPermalinks::remove_permalink_slug(array('event', 'book', 'my_other_cpt'));
