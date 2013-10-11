@@ -51,3 +51,18 @@ Jigsaw::show_notice('Cache has been flushed', 'updated');
 Jigsaw::show_notice('Error flushing cache, is the plugin activated?', 'error');
 ```
 
+#JigsawPermalinks
+
+### Remove a custom post type permalink
+
+###### 'JigsawPermalinks::remove_permalink_slug($custom_post_type);
+
+```php
+JigsawPermalinks::remove_permalink_slug('event');
+```
+
+or 
+
+```php
+JigsawPermalinks::remove_permalink_slug(array('event', 'book', 'my_other_cpt'));
+```
