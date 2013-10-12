@@ -4,7 +4,7 @@
 	Plugin Name: Jigsaw
 	Description: Simple ways to make admin customizations for WordPress
 	Author: Jared Novack + Upstatement
-	Version: 0.4
+	Version: 0.4.1
 	Author URI: http://jigsaw.upstatement.com/
 	*/
 
@@ -26,11 +26,11 @@
 				$removed_permalink_slugs = $cpt_slugs;
 			}
 			$GLOBALS['removed_permalink_slugs'] = $removed_permalink_slugs;
-			if (!has_filter('post_type_link', array('Jigsaw', 'remove_permalink_slug_post_type_link'))){
-    			add_filter('post_type_link', array('Jigsaw', 'remove_permalink_slug_post_type_link'), 10, 3);
+			if (!has_filter('post_type_link', array('JigsawPermalinks', 'remove_permalink_slug_post_type_link'))){
+    			add_filter('post_type_link', array('JigsawPermalinks', 'remove_permalink_slug_post_type_link'), 10, 3);
     		}
-    		if (!has_action('pre_get_posts', array('Jigsaw', 'remove_permalink_slug_pre_get_posts'))){
-    			add_action('pre_get_posts', array('Jigsaw', 'remove_permalink_slug_pre_get_posts'));
+    		if (!has_action('pre_get_posts', array('JigsawPermalinks', 'remove_permalink_slug_pre_get_posts'))){
+    			add_action('pre_get_posts', array('JigsawPermalinks', 'remove_permalink_slug_pre_get_posts'));
     		}
 		}
 
