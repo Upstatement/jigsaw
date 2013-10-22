@@ -15,11 +15,22 @@
 			$wp_rewrite->author_base = $base;
 		}
 
+		public static function add_cpt_to_authors($cpt_slugs){
+			add_action( 'pre_get_posts', function(&$query) use ($cpt_slugs){
+				if ( $query->is_author ){
+					$query->set( 'post_type', $cpt_slugs );
+				}
+			});
+		}
+
 		public static function remove_permalink_slug($cpt_slugs){
 			if (is_string($cpt_slugs)){
 				$cpt_slugs = array($cpt_slugs);
 			}
-			$removed_permalink_slugs = $GLOBALS['removed_permalink_slugs'];
+			$removed_permalink_slugs = array();
+			if (isset($GLOBALS['removed_permalink_slugs'])){
+				$removed_permalink_slugs = $GLOBALS['removed_permalink_slugs'];
+			}
 			if (is_array($removed_permalink_slugs)){
 				$removed_permalink_slugs = array_merge($removed_permalink_slugs, $cpt_slugs);
 			} else {
@@ -34,7 +45,7 @@
     		}
 		}
 
-		function remove_permalink_slug_post_type_link($post_link, $post, $leavename){
+		public static function remove_permalink_slug_post_type_link($post_link, $post, $leavename){
 			$post_types = $GLOBALS['removed_permalink_slugs'];
 			if ( ! in_array( $post->post_type, $post_types ) || 'publish' != $post->post_status ){
     			return $post_link;
@@ -43,7 +54,7 @@
     		return $post_link;
 		}
 
-		function remove_permalink_slug_pre_get_posts($query){
+		public static function remove_permalink_slug_pre_get_posts($query){
 			$post_types = $GLOBALS['removed_permalink_slugs'];
 			$post_types[] = 'page';
 			$post_types[] = 'post';
