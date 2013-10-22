@@ -4,7 +4,7 @@
 	Plugin Name: Jigsaw
 	Description: Simple ways to make admin customizations for WordPress
 	Author: Jared Novack + Upstatement
-	Version: 0.4.2
+	Version: 0.4.3
 	Author URI: http://jigsaw.upstatement.com/
 	*/
 
@@ -13,6 +13,15 @@
 		public static function set_author_base($base){
 			global $wp_rewrite;
 			$wp_rewrite->author_base = $base;
+		}
+
+		public static function set_search_permalink($base = 'search'){
+			add_action( 'template_redirect', function() use ($base){
+				if ( is_search() && ! empty( $_GET['s'] ) ) {
+					wp_redirect( home_url( "/".$base."/" ) . urlencode( get_query_var( 's' ) ) );
+					exit();
+				}
+			});
 		}
 
 		public static function add_cpt_to_authors($cpt_slugs){
