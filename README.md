@@ -84,3 +84,10 @@ or
 ```php
 JigsawPermalinks::remove_permalink_slug(array('event', 'book', 'my_other_cpt'));
 ```
+
+### Set a custom permalink
+###### `JigsawPermalinks::set_permalink($post_type, $structure);`
+
+```php
+JigsawPermalinks::set_permalink('gallery', '/galleries/%year%/%gallery%');
+```
