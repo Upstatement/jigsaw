@@ -4,9 +4,11 @@
 	Plugin Name: Jigsaw
 	Description: Simple ways to make admin customizations for WordPress
 	Author: Jared Novack + Upstatement
-	Version: 0.4.4
+	Version: 0.4.6
 	Author URI: http://jigsaw.upstatement.com/
 	*/
+
+	require_once('jigsaw-timber.php');
 
 	class JigsawPermalinks {
 
@@ -93,7 +95,7 @@
 		public static function set_search_permalink($base = 'search'){
 			add_action( 'template_redirect', function() use ($base){
 				if ( is_search() && ! empty( $_GET['s'] ) ) {
-					wp_redirect( home_url( "/".$base."/" ) . urlencode( get_query_var( 's' ) ) );
+					wp_redirect( ( "/".$base."/" ) . urlencode( get_query_var( 's' ) ) );
 					exit();
 				}
 			});
@@ -159,15 +161,23 @@
 
 	class Jigsaw {
 
+		public static function add_js($file){
+			self::add_admin_js_or_css($file, 'wp_enqueue_script');
+		}
+
 		public static function add_css($file){
+			self::add_admin_js_or_css($file, 'wp_enqueue_style');
+		}
+
+		public static function add_admin_js_or_css($file, $function = 'wp_enqueue_style'){
 			if (!is_admin()){
 				return;
 			}
 			if (!file_exists(ABSPATH.$file)){
 				$file = trailingslashit(get_template_directory_uri()).$file;
 			}
-			add_action('admin_enqueue_scripts', function() use ($file){
-				wp_enqueue_style(sanitize_title($file), $file);
+			add_action('admin_enqueue_scripts', function() use ($file, $function){
+				$function(sanitize_title($file), $file);
 			});
 		}
 
@@ -247,23 +257,73 @@
 			});
 		}
 
-		public static function add_column($post_type, $label, $callback, $priority = 10){
-			$filter_name = 'manage_'.$post_type.'_posts_columns';
-			add_filter($filter_name , function ($columns) use ($label, $priority){
-				$key = sanitize_title($label);
-				$col = array($key => $label);
-				if ($priority < 0){
-					return array_merge($col, $columns);
-				}
-				return array_merge($columns, $col);
-			}, $priority);
-
-			add_action('manage_'.$post_type.'_posts_custom_column', function($col, $pid) use ($label, $callback){
-				$key = sanitize_title($label);
-				if ($col == $key){
-					$callback($pid);
-				}
-			}, $priority, 2);
+		public static function remove_column($post_types, $columns){
+			if (!is_array($post_types)){
+				$post_types = array($post_types);
+			}
+			if (!is_array($columns)){
+				$columns = array($columns);
+			}
+			foreach($post_types as $post_type){
+				add_action('manage_edit-'.$post_type.'_columns', function($column_headers) use ($columns) {
+					foreach($columns as $column){
+						unset($column_headers[$column]);
+					}
+	    			return $column_headers;
+				});
+			}
 		}
 
+		public static function add_column($post_types, $label, $callback, $priority = 10){
+			if (!is_array($post_types)){
+				$post_types = array($post_types);
+			}
+			foreach($post_types as $post_type){
+				$filter_name = 'manage_'.$post_type.'_posts_columns';
+				add_filter($filter_name , function ($columns) use ($label, $priority){
+					$key = sanitize_title($label);
+					$col = array($key => $label);
+					if ($priority < 0){
+						return array_merge($col, $columns);
+					}
+					return array_merge($columns, $col);
+				}, $priority);
+
+				add_action('manage_'.$post_type.'_posts_custom_column', function($col, $pid) use ($label, $callback){
+					$key = sanitize_title($label);
+					if ($col == $key){
+						$callback($pid);
+					}
+				}, $priority, 2);
+			}
+		}
+
+		public static function add_versioning($gitPath, $pathFromRoot = '/') {
+			$db = '';
+			if (is_multisite()){
+				$db = get_site_option('database_version');
+			} else {
+				$db = get_option('database_version');
+			}
+			if (!strlen($db)){
+				Jigsaw::show_notice('Database version not found');
+			}
+			add_filter( 'update_footer', function($default) use ($gitPath, $pathFromRoot, $db) {
+				// SQL row with the meta_key of "database_version," located in the "sitemeta" sql table
+				// Edit that row every time you export a database for handoff
+				$gitPath = trailingslashit($gitPath) . 'commit/';
+				$gitMeta = '';
+				exec('cd ' . ABSPATH . $pathFromRoot . '; git rev-parse --verify HEAD 2> /dev/null', $output);
+				$hash = substr($output[0], 0, 6);
+				// $gitMeta = if(isset($meta)) {'by ' . $meta . ', '};
+
+				// exec('cd ' . $_SERVER["DOCUMENT_ROOT"] . '/wp-content/themes; git log -1 --pretty=format:"%an, %ar"', $meta);
+				$db = apply_filters('jigsaw_versioning_database', $db);
+				$commit = ', <strong>Code Commit:</strong> ' . '<a href="' . $gitPath . $output[0] . '">' . $hash . '</a>, ' . $gitMeta;
+			    $return = '<strong>Database:</strong> ' . $db . $commit . $default;
+			    return $return;
+			}, 11 );
+		}
 	}
+
+
