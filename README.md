@@ -13,6 +13,20 @@ Jigsaw::add_column('slides', 'Preview', function($pid){
 });
 ```
 
+```php
+Jigsaw::add_column(array('slides', 'post'), 'Preview', function($pid){
+  	$data = array();
+	$data['post'] = new TimberPost($pid);
+	Timber::render('admin/slide-table-preview.twig', $data);
+});
+```
+
+### Remove a column from the admin
+
+```php
+Jigsaw::remove_column('slides', 'author');
+```
+
 ### Add something to the admin bar
 
 ###### `Jigsaw::add_toolbar_item($label, $url_or_callback_function);`
