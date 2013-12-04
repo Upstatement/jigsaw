@@ -4,7 +4,7 @@
 	Plugin Name: Jigsaw
 	Description: Simple ways to make admin customizations for WordPress
 	Author: Jared Novack + Upstatement
-	Version: 0.4.6
+	Version: 0.4.7
 	Author URI: http://jigsaw.upstatement.com/
 	*/
 
@@ -268,6 +268,7 @@
 				add_action('manage_edit-'.$post_type.'_columns', function($column_headers) use ($columns) {
 					foreach($columns as $column){
 						unset($column_headers[$column]);
+						unset($column_headers[strtolower($column)]);
 					}
 	    			return $column_headers;
 				});
