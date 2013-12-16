@@ -8,7 +8,8 @@
 	Author URI: http://jigsaw.upstatement.com/
 	*/
 
-	require_once('jigsaw-timber.php');
+	# what the hell is this?
+	# require_once('jigsaw-timber.php');
 
 	class JigsawPermalinks {
 
