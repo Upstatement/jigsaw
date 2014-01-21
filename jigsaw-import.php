@@ -4,7 +4,7 @@
 Plugin Name: Jigsaw Importer
 Plugin URI: http://jigsaw.upstatement.com
 Author: Jared Novack
-Version: 0.1
+Version: 0.3
 */
 
 	class JigsawPostImporter {
@@ -13,6 +13,7 @@ Version: 0.1
 		var $metas = array();
 		var $queries = array();
 		var $taxes = array();
+
 		var $table;
 
 		function __construct($posts_table){
@@ -31,7 +32,19 @@ Version: 0.1
 			$wpdb->query($query);
 			$query = "DELETE FROM $wpdb->postmeta WHERE post_id IN ($pid_string)";
 			$wpdb->query($query);
-			//$wpdb->query($query);
+			$query = "DELETE FROM $wpdb->term_relationships WHERE object_id IN ($pid_string)";
+			$wpdb->query($query);
+			$max = $wpdb->get_var("SELECT ID FROM $wpdb->posts ORDER BY ID DESC LIMIT 1");
+			$max = intval($max) + 1;
+			$query = "ALTER TABLE $wpdb->posts AUTO_INCREMENT = $max";
+			echo $query;
+			$wpdb->query($query);
+
+			$max = $wpdb->get_var("SELECT term_taxonomy_id FROM $wpdb->term_taxonomy ORDER BY term_taxonomy_id DESC LIMIT 1");
+			$max = intval($max) + 1;
+			$query = "ALTER TABLE $wpdb->term_taxonomy AUTO_INCREMENT = $max";
+			echo $query;
+			$wpdb->query($query);
 		}
 
 		function add_imported_col(){
@@ -58,13 +71,24 @@ Version: 0.1
 
 		function set_taxonomy($tax){
 			$this->taxes[] = $tax;
-
 		}
 
-		function import($count = 10){
+		function add_query($callback){
+			$this->queries[] = $callback;
+		}
+
+		function import($count = 10, $id = null){
 			global $wpdb;
-			$query = "SELECT * FROM $this->table WHERE imported IS NULL OR imported = 0 LIMIT $count";
+			$and = '';
+			if ($id){
+				$query = "SELECT * FROM $this->table WHERE id = '$id' LIMIT 1";
+			} else {
+				$query = "SELECT * FROM $this->table WHERE (imported IS NULL OR imported = 0) LIMIT $count";
+			}
 			$results = $wpdb->get_results($query);
+			if (!count($results)){
+				echo 'NO MORE IMPORTS LEFT!';
+			}
 			$queries = array();
 			foreach($results as $row){
 				$post = array('post_status' => 'publish');
@@ -85,9 +109,13 @@ Version: 0.1
 				foreach($this->taxes as $taxonomy){
 					$taxonomy->import($pid, $row);
 				}
+				foreach($this->queries as $query){
+					$query($pid, $row);
+				}
 				if ($pid){
 					$queries[] = "UPDATE $this->table SET imported = 1 WHERE id = $row->id LIMIT 1";
 				}
+				wp_remove_object_terms($pid, 1, 'category');
 			}
 			foreach($queries as $query){
 				$wpdb->query($query);
@@ -95,11 +123,25 @@ Version: 0.1
 		}
 	}
 
+	class JigsawMetaImporter {
+
+		var $join_data;
+
+		function set_join_table($post_col, $tax_col, $tax_table){
+			$this->join_data = new stdClass();
+			$this->join_data->post_col = $post_col;
+			$this->join_data->tax_col = $tax_col;
+			$this->join_data->tax_table = $tax_table;
+		}
+
+	}
+
 	class JigsawTaxonomyImporter {
 
 		var $tax_name;
 		var $metas = array();
 		var $fields = array();
+		var $queries = array();
 
 		var $simple_col;
 		var $join_data;
@@ -107,11 +149,25 @@ Version: 0.1
 		var $tax_data;
 
 		function __construct($tax_name){
+			if ($tax_name == 'tag'){
+				$tax_name = 'post_tag';
+			}
 			$this->tax_name = $tax_name;
 			if ($tax_name != 'category' && $tax_name != 'post_tag'){
 				add_action('init', function() use ($tax_name){
 					$this->register($tax_name);
 				});
+			}
+		}
+
+		function run_queries($tid, $data){
+			echo 'run queries for '.$tid;
+			if (!is_array($this->queries)){
+				return;
+			}
+			foreach($this->queries as $query){
+				echo 'query!';
+				$query($tid, $data);
 			}
 		}
 
@@ -132,7 +188,8 @@ Version: 0.1
 			foreach($terms as $term){
 				$term = trim($term);
 				if (isset($term) && strlen($term)){
-					$this->insert_term($pid, $term);
+					$tid = $this->insert_term($pid, $term);
+					$this->run_queries($tid, $row);
 				}
 			}
 		}
@@ -142,16 +199,18 @@ Version: 0.1
 			if ($tid && isset($tid['term_id'])){
 				$tid = $tid['term_id'];
 			} else {
-				echo 'term='.$term_name;
 				$tid = wp_insert_term($term_name, $this->tax_name);
 				if (is_array($tid) && isset($tid['term_id'])){
 					$tid = $tid['term_id'];
 				} else {
-					print_r($tid);
+					echo 'I AM AN ERRROR';
+					echo 'tried to insert '.$term_name.' in '.$this->tax_name;
+					//print_r($tid);
 				}
 			}
 			$tid = intval($tid);
 			wp_set_object_terms($pid, $tid, $this->tax_name, true);
+			return $tid;
 		}
 
 		function import_from_pivot($pid, $row){
@@ -163,9 +222,13 @@ Version: 0.1
 			$pivots = $wpdb->get_results($pivot_query);
 			$pivot_tax_column = $pd->tax_col;
 			foreach($pivots as $pivot){
-				$term_data_query = "SELECT $td->name_col FROM $td->tax_table WHERE $td->tax_col = '$pivot->$pivot_tax_column' LIMIT 1";
-				$name = $wpdb->get_var($name);
-				$this->insert_term($pid, $name);
+				$tax_id = $pivot->$pivot_tax_column;
+				$term_data_query = "SELECT $td->name_col FROM $td->tax_table WHERE $td->tax_col = '$tax_id' LIMIT 1";
+				$name = $wpdb->get_var($term_data_query);
+				if (is_numeric($name)){
+					echo 'why you a number?'.$name;
+				}
+				$this->insert_term($pid, trim($name));
 			}
 		}
 
@@ -184,15 +247,36 @@ Version: 0.1
 			if (isset($term_row->$name_col)){
 				$name = $term_row->$name_col;
 				if (!strlen($name)){
-					//$name = 'Volume '.$term_row->issue_volume.', Issue '.$term_row->issue_number;
+					$name = 'Volume '.$term_row->issue_volume.' - Issue '.$term_row->issue_number;
 				}
-				$this->insert_term($pid, $name);
+				$tid = $this->insert_term($pid, $name);
+				$this->run_queries($tid, $term_row);
 			}
 		}
 
+		function wipe($floor = 50){
+			global $wpdb;
+			$tids = "SELECT term_id FROM $wpdb->term_taxonomy WHERE term_taxonomy_id > $floor AND taxonomy = '$this->tax_name'";
+			$tids = $wpdb->get_col($tids);
+			foreach($tids as $tid){
+				wp_delete_term( $tid, $this->tax_name);
+			}
+			$key = $this->tax_name.'_';
+			$meta = "DELETE FROM $wpdb->options WHERE option_name LIKE '$key%'";
+			$wpdb->query($meta);
+			$key = '_'.$key;
+			$meta = "DELETE FROM $wpdb->options WHERE option_name LIKE '$key'";
+			$wpdb->query($meta);
+		}
+
+		function add_query($query){
+			$this->queries[] = $query;
+		}
+
 		function import($pid, $row){
+			$tid;
 			if (isset($this->simple_col)){
-				$this->import_from_col($pid, $row);
+				$tid = $this->import_from_col($pid, $row);
 			}
 			if (isset($this->join_data)){
 				$this->import_from_join($pid, $row);
@@ -200,6 +284,7 @@ Version: 0.1
 			if (isset($this->pivot_data) && isset($this->tax_data)){
 				$this->import_from_pivot($pid, $row);
 			}
+
 		}
 
 		function set_col($post_col){
@@ -228,7 +313,7 @@ Version: 0.1
 			$this->tax_data->name_col = $name_col;
 		}
 
-		function set_col_table($post_col, $tax_col, $tax_table){
+		function set_join_table($post_col, $tax_col, $tax_table){
 			$this->join_data = new stdClass();
 			$this->join_data->post_col = $post_col;
 			$this->join_data->tax_col = $tax_col;
@@ -265,7 +350,6 @@ Version: 0.1
 				$this->import_from_join($row->ID, $row);
 				$pids[] = $row->ID;
 			}
-			print_r($pids);
 			$pid_string = implode(', ', $pids);
 			$finish = "UPDATE nmhvd_posts SET post_author = 1 WHERE ID IN ($pid_string)";
 			echo $finish;
