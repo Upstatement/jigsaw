@@ -34,6 +34,8 @@ Version: 0.3
 			$wpdb->query($query);
 			$query = "DELETE FROM $wpdb->term_relationships WHERE object_id IN ($pid_string)";
 			$wpdb->query($query);
+			$query='DELETE FROM wp_posts WHERE post_type = "revision"';  // remove extraneous revisions
+			$wpdb->query($query);
 			$max = $wpdb->get_var("SELECT ID FROM $wpdb->posts ORDER BY ID DESC LIMIT 1");
 			$max = intval($max) + 1;
 			$query = "ALTER TABLE $wpdb->posts AUTO_INCREMENT = $max";
@@ -93,12 +95,16 @@ Version: 0.3
 			foreach($results as $row){
 				$post = array('post_status' => 'publish');
 				foreach($this->fields as $field => $db_col){
-					$clear = preg_replace('/[^a-zA-Z0-9\s]/', '', strip_tags(html_entity_decode($row->$db_col)));
-					if ($field == 'post_date'){
-						$clear = strtotime($clear);
-						$clear = date("Y-m-d H:i:s", $clear);
+					if (isset($row->$db_col)){
+						$clear = strip_tags(html_entity_decode($row->$db_col));
+						if ($field == 'post_date'){
+							$clear = strtotime($clear);
+							$clear = date("Y-m-d H:i:s", $clear);
+						}
+						$post[$field] = $clear;
+					} else {
+						//echo 'why are you calling '.$db_col.'?';
 					}
-					$post[$field] = $clear;
 				}
 				$post['post_name'] = sanitize_title($post['post_title']);
 				$pid = wp_insert_post($post);
@@ -120,6 +126,23 @@ Version: 0.3
 			foreach($queries as $query){
 				$wpdb->query($query);
 			}
+			/* Convert ISO chars to UTF-8 after DB import */
+			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€œ', '“')";
+			$wpdb->query($query);
+			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€', '”')";
+			$wpdb->query($query);
+			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€™', '’')";
+			$wpdb->query($query);
+			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€˜', '‘')";
+			$wpdb->query($query);
+			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€”', '–')";
+			$wpdb->query($query);
+			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€“', '—')";
+			$wpdb->query($query);
+			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€¢', '-')";
+			$wpdb->query($query);
+			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€¦', '…')";
+			$wpdb->query($query);
 		}
 	}
 
