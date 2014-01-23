@@ -161,8 +161,7 @@ Version: 0.3
 			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€¦', '…')";
 			$wpdb->query($query);
 
-
-			$query='DELETE FROM wp_posts WHERE post_type = "revision"';  // remove extraneous revisions
+			//$query='DELETE FROM wp_posts WHERE post_type = "revision"';  // remove extraneous revisions
 		}
 	}
 
@@ -204,7 +203,7 @@ Version: 0.3
 		}
 
 		function run_queries($tid, $data){
-			echo 'run queries for '.$tid;
+			//echo 'run queries for '.$tid;
 			if (!is_array($this->queries)){
 				return;
 			}
@@ -238,6 +237,7 @@ Version: 0.3
 		}
 
 		function insert_term($pid, $term_name){
+
 			$tid = term_exists($term_name, $this->tax_name);
 			if ($tid && isset($tid['term_id'])){
 				$tid = $tid['term_id'];
@@ -246,9 +246,9 @@ Version: 0.3
 				if (is_array($tid) && isset($tid['term_id'])){
 					$tid = $tid['term_id'];
 				} else {
-					echo 'I AM AN ERRROR';
+					echo '</br>I AM AN ERROR';
 					echo 'tried to insert '.$term_name.' in '.$this->tax_name;
-					//print_r($tid);
+					echo 'tid'.($tid);
 				}
 			}
 			$tid = intval($tid);
@@ -305,8 +305,13 @@ Version: 0.3
 				wp_delete_term( $tid, $this->tax_name);
 			}
 			$key = $this->tax_name.'_';
-			$meta = "DELETE FROM $wpdb->options WHERE option_name LIKE '$key%'";
-			$wpdb->query($meta);
+			try {
+				$meta = "DELETE FROM $wpdb->options WHERE option_name LIKE '$key%'";
+				$wpdb->query($meta);
+			} catch (Exception $e){
+				$meta = "DELETE FROM $wpdb->options WHERE option_name LIKE '$key%'";
+				$wpdb->query($meta);
+			}
 			$key = '_'.$key;
 			$meta = "DELETE FROM $wpdb->options WHERE option_name LIKE '$key'";
 			$wpdb->query($meta);
@@ -327,7 +332,6 @@ Version: 0.3
 			if (isset($this->pivot_data) && isset($this->tax_data)){
 				$this->import_from_pivot($pid, $row);
 			}
-
 		}
 
 		function set_col($post_col){
