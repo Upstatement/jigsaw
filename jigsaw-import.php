@@ -65,7 +65,6 @@ Version: 0.3
 			$fields = mysql_list_fields(DB_NAME, $this->table);
 			$columns = mysql_num_fields($fields);
 			for ($i = 0; $i < $columns; $i++) {$field_array[] = mysql_field_name($fields, $i);}
-
 			if (in_array('imported', $field_array)) {
 				return true;
 			}
@@ -160,6 +159,8 @@ Version: 0.3
 			$wpdb->query($query);
 			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€¦', '…')";
 			$wpdb->query($query);
+			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â??', '’')";
+			$wpdb->query($query);
 
 			//$query='DELETE FROM wp_posts WHERE post_type = "revision"';  // remove extraneous revisions
 		}
@@ -208,7 +209,7 @@ Version: 0.3
 				return;
 			}
 			foreach($this->queries as $query){
-				echo 'query!';
+				//echo 'query!';
 				$query($tid, $data);
 			}
 		}
