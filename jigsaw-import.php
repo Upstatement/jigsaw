@@ -25,15 +25,19 @@ Version: 0.3
 			global $wpdb;
 			$query = "UPDATE $this->table SET imported = NULL";
 			$wpdb->query($query);
+			echo 'my query: '.$query;
 			$query = "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'oldid'";
 			$pids = $wpdb->get_col($query);
 			$pid_string = implode(',', $pids);
-			$query = "DELETE FROM $wpdb->posts WHERE ID IN ($pid_string)";
-			$wpdb->query($query);
-			$query = "DELETE FROM $wpdb->postmeta WHERE post_id IN ($pid_string)";
-			$wpdb->query($query);
-			$query = "DELETE FROM $wpdb->term_relationships WHERE object_id IN ($pid_string)";
-			$wpdb->query($query);
+			echo 'pid: '.$pid_string;
+			if($pid_string){
+				$query = "DELETE FROM $wpdb->posts WHERE ID IN ($pid_string)";
+				$wpdb->query($query);
+				$query = "DELETE FROM $wpdb->postmeta WHERE post_id IN ($pid_string)";
+				$wpdb->query($query);
+				$query = "DELETE FROM $wpdb->term_relationships WHERE object_id IN ($pid_string)";
+				$wpdb->query($query);
+			}
 			$query='DELETE FROM wp_posts WHERE post_type = "revision"';  // remove extraneous revisions
 			$wpdb->query($query);
 			$max = $wpdb->get_var("SELECT ID FROM $wpdb->posts ORDER BY ID DESC LIMIT 1");
@@ -50,9 +54,22 @@ Version: 0.3
 		}
 
 		function add_imported_col(){
-			global $wpdb;
-			$query = "ALTER TABLE $this->table ADD COLUMN imported tinyint(1)";
-			//$wpdb->query($query);
+			if(!$this->has_imported_col()){
+				global $wpdb;
+				$query = "ALTER TABLE $this->table ADD COLUMN imported tinyint(1)";
+				$wpdb->query($query);
+			}
+		}
+
+		function has_imported_col(){
+			$fields = mysql_list_fields(DB_NAME, $this->table);
+			$columns = mysql_num_fields($fields);
+			for ($i = 0; $i < $columns; $i++) {$field_array[] = mysql_field_name($fields, $i);}
+
+			if (in_array('imported', $field_array)) {
+				return true;
+			}
+			return false;
 		}
 
 		function reset_imports(){
@@ -103,7 +120,7 @@ Version: 0.3
 						}
 						$post[$field] = $clear;
 					} else {
-						//echo 'why are you calling '.$db_col.'?';
+						echo '</br>why are you calling '.$db_col.'?</br> for field '.$field.'</br>';
 					}
 				}
 				$post['post_name'] = sanitize_title($post['post_title']);
@@ -143,6 +160,9 @@ Version: 0.3
 			$wpdb->query($query);
 			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€¦', '…')";
 			$wpdb->query($query);
+
+
+			$query='DELETE FROM wp_posts WHERE post_type = "revision"';  // remove extraneous revisions
 		}
 	}
 
