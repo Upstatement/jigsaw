@@ -326,6 +326,17 @@
 			    return $return;
 			}, 11 );
 		}
+		
+		public static function rename_taxonomy($tax_slug, $new_name){
+			add_action('init', function() use ($tax_slug, $new_name){
+				global $wp_taxonomies;
+		    		$tax = $wp_taxonomies[$tax_slug];
+		   		$tax->label = $new_name.'s';
+		    		$tax->labels->singular_name = $new_name;
+		    		$tax->labels->name = $tax->label;
+		    		$tax->labels->menu_name = $tax->label;
+			});
+		}
 	}
 
 
