@@ -143,24 +143,25 @@ Version: 0.3
 				$wpdb->query($query);
 			}
 			/* Convert ISO chars to UTF-8 after DB import */
-			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€œ', '“')";
-			$wpdb->query($query);
-			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€', '”')";
-			$wpdb->query($query);
-			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€™', '’')";
-			$wpdb->query($query);
-			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€˜', '‘')";
-			$wpdb->query($query);
-			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€”', '–')";
-			$wpdb->query($query);
-			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€“', '—')";
-			$wpdb->query($query);
-			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€¢', '-')";
-			$wpdb->query($query);
-			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â€¦', '…')";
-			$wpdb->query($query);
-			$query = "UPDATE wp_posts SET post_content = REPLACE(post_content, 'â??', '’')";
-			$wpdb->query($query);
+			$columns = array("post_title", "post_excerpt", "post_name", "post_content");
+			
+			foreach($columns as $col) {
+
+				$queries = array();
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€œ', '“')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€', '”')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€™', '’')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€˜', '‘')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€”', '–')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€“', '—')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€¢', '-')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€¦', '…')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â??', '’')";
+
+				foreach($queries as $query){
+					$wpdb->query($query);
+				}
+			}
 
 			//$query='DELETE FROM wp_posts WHERE post_type = "revision"';  // remove extraneous revisions
 		}
