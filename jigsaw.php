@@ -275,6 +275,27 @@
 				});
 			}
 		}
+		
+		public static function add_taxonomy_column($tax_types, $label, $callback, $priority = 10){
+			if (!is_array($tax_types)){
+				$tax_types = array($tax_types);
+			}
+			foreach($tax_types as $tax){
+				$filter_name = 'manage_edit-'.$tax.'_columns';
+				add_filter($filter_name, function($columns) use ($label, $priority){
+					$key = sanitize_title($label);
+					$columns[$key] = __($label);
+					return $columns;
+				});
+
+				add_action('manage_'.$tax.'_custom_column', function($val, $col, $tid) use ($label, $callback){
+					$key = sanitize_title($label);
+					if ($col == $key){
+						$callback($tid);
+					}
+				}, 5, 3);
+			}
+		}
 
 		public static function add_column($post_types, $label, $callback, $priority = 10){
 			if (!is_array($post_types)){
