@@ -23,8 +23,14 @@ Jigsaw::add_column(array('slides', 'post'), 'Preview', function($pid){
 
 ### Remove a column from the admin
 
+###### `Jigsaw::add_column($post_types, $column_slug);`
+
 ```php
 Jigsaw::remove_column('slides', 'author');
+```
+
+```php
+Jigsaw::remove_column(array('slides', 'post'), 'author');
 ```
 
 ### Add something to the admin bar
