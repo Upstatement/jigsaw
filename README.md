@@ -3,7 +3,7 @@ Simple ways to make admin customizations for WordPress. For example, you can...
 
 ### Add a column to an admin page!
 
-###### `Jigsaw::add_column($post_type, $column_label, $callback_function, $priority = 10);`
+###### `Jigsaw::add_column($post_type, $column_label, $callback_function, $order = 10);`
 
 ```php
 Jigsaw::add_column('slides', 'Preview', function($pid){
@@ -30,7 +30,7 @@ Jigsaw::remove_column('slides', 'author');
 ### Add something to the admin bar
 
 ###### `Jigsaw::add_toolbar_item($label, $url_or_callback_function);`
-```
+```php
 Jigsaw::add_toolbar_item('Clear Cache', function(){
 	$total_cache->flush_all();
 });
@@ -39,7 +39,7 @@ Jigsaw::add_toolbar_item('Clear Cache', function(){
 ### Add a dropdown
 
 ###### `Jigsaw::add_toolbar_group($label, $items);`
-```
+```php
 $optionOne = new stdClass();
 $optionOne->label = 'All Caches';
 $optionOne->action = function(){
