@@ -157,6 +157,12 @@ Version: 0.3
 				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€¢', '-')";
 				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€¦', '…')";
 				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â??', '’')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â?', '’')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'Ã©jÃ', 'é')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'Â§', '§')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'ï»¿', '')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'âS', '’S')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'Sâ', 'S’')";
 
 				foreach($queries as $query){
 					$wpdb->query($query);
@@ -229,7 +235,9 @@ Version: 0.3
 				$split = ', ';
 			}
 			$terms = explode($split, $term);
+			$words_to_erase = array("/\band\b/ ","/\b&\b/");
 			foreach($terms as $term){
+				$term = preg_replace($words_to_erase, "", $term);
 				$term = trim($term);
 				if (isset($term) && strlen($term)){
 					$tid = $this->insert_term($pid, $term);
