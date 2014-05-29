@@ -191,7 +191,7 @@
 			}
 			add_action( 'admin_notices', function() use ($text, $class){
 				echo '<div class="'.$class.'"><p>'.$text.'</p></div>';
-			});
+			}, 1);
 		}
 
 		public static function add_toolbar_group($label, $items){
@@ -362,6 +362,28 @@
 		    		$tax->labels->name = $tax->label;
 		    		$tax->labels->menu_name = $tax->label;
 			});
+		}
+
+		public static function add_row_action($label, $url, $post_type = null){
+			if (in_array($post_type, array('any', 'all'))){
+				$post_type = null;
+			}
+			if (is_string($post_type)){
+				$post_type = array($post_type);
+			}
+			$row_action_callback = function($actions, $post) use ($label, $post_type, $url){
+				if (is_callable($url)){
+					$url = $url($post);
+				}
+				if ($post_type == null || in_array($post->post_type, $post_type)){
+					$actions[sanitize_title($label)] = '<a href="'.$url.'" title="Edit this item">'.$label.'</a>';
+				}
+				
+				return $actions;
+			};
+
+			add_filter('post_row_actions', $row_action_callback, 10, 2);
+			add_filter('page_row_actions', $row_action_callback, 10, 2);
 		}
 	}
 
