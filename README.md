@@ -1,5 +1,5 @@
 # Jigsaw
-Simple ways to make admin customizations for WordPress. For example, you can...
+Simple ways to make admin customizations for WordPress. You know all that brain space you saved for [memorizing hooks](http://wptavern.com/learn-three-wordpress-filters-a-day)? Use it for something better. For example, you can...
 
 ### Add a column to an admin page!
 
