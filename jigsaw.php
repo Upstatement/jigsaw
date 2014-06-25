@@ -4,18 +4,18 @@
 	Plugin Name: Jigsaw
 	Description: Simple ways to make admin customizations for WordPress
 	Author: Jared Novack + Upstatement
-	Version: 0.4.9
+	Version: 0.4.10
 	Author URI: http://jigsaw.upstatement.com/
 	*/
 
-	# what the hell is this?
-	# require_once('jigsaw-timber.php');
-
 	class JigsawPermalinks {
 
-		public static function set_author_base($base){
+		public static function set_author_base($base, $with_front = true){
 			global $wp_rewrite;
 			$wp_rewrite->author_base = $base;
+			if (!$with_front){
+	   			$wp_rewrite->author_structure = '/' . $wp_rewrite->author_base. '/%author%';
+	   		}
 		}
 
 		public static function set_permalink($post_type, $struc){
