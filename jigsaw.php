@@ -201,14 +201,17 @@
 			}, 11 );
 		}
 		
-		public static function rename_taxonomy($tax_slug, $new_name){
-			add_action('init', function() use ($tax_slug, $new_name){
+		public static function rename_taxonomy($tax_slug, $new_name, $new_name_plural = null){
+			add_action('init', function() use ($tax_slug, $new_name, $new_name_plural){
 				global $wp_taxonomies;
-		    		$tax = $wp_taxonomies[$tax_slug];
-		   		$tax->label = $new_name.'s';
-		    		$tax->labels->singular_name = $new_name;
-		    		$tax->labels->name = $tax->label;
-		    		$tax->labels->menu_name = $tax->label;
+		    	$tax = $wp_taxonomies[$tax_slug];
+		    	if ($new_name_plural == null){
+		    		$new_name_plural = $new_name.'s';
+		    	}
+		   		$tax->label = $new_name_plural;
+		    	$tax->labels->singular_name = $new_name;
+		    	$tax->labels->name = $tax->label;
+		    	$tax->labels->menu_name = $tax->label;
 			});
 		}
 
