@@ -28,6 +28,13 @@ Version: 0.3
 			echo 'my query: '.$query;
 			$query = "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'oldid'";
 			$pids = $wpdb->get_col($query);
+			foreach($pids as $i){ // save certain test posts
+				if ($pids[$i] == 30 || $pids[$i] == 37 || $pids[$i] == 783 || $pids[$i] == 826) {
+					echo "saving post " . $pids[$i];
+					unset($pids[$i]);
+				}
+			}
+			$pids = array_values($pids);
 			$pid_string = implode(',', $pids);
 			echo 'pid: '.$pid_string;
 			if($pid_string){
@@ -87,6 +94,10 @@ Version: 0.3
 			$this->metas[$field] = $db_col;
 		}
 
+		function set_case_meta($field, $db_col){
+			$this->metas[$field] = $db_col;
+		}
+
 		function set_taxonomy($tax){
 			$this->taxes[] = $tax;
 		}
@@ -95,7 +106,13 @@ Version: 0.3
 			$this->queries[] = $callback;
 		}
 
+		function set_online_only($field1, $field2){
+			$this->metas[$field1] = '1';
+			$this->metas[$field2] = 'field_52b2186804cc3';
+		}
+
 		function import($count = 10, $id = null){
+			echo(" start ");
 			global $wpdb;
 			$and = '';
 			if ($id){
@@ -112,7 +129,7 @@ Version: 0.3
 				$post = array('post_status' => 'publish');
 				foreach($this->fields as $field => $db_col){
 					if (isset($row->$db_col)){
-						$clear = strip_tags(html_entity_decode($row->$db_col));
+						$clear = strip_tags(html_entity_decode($row->$db_col), '<i><b><br /><center><hr><a><div><sup><table><img>');
 						if ($field == 'post_date'){
 							$clear = strtotime($clear);
 							$clear = date("Y-m-d H:i:s", $clear);
@@ -142,36 +159,12 @@ Version: 0.3
 			foreach($queries as $query){
 				$wpdb->query($query);
 			}
-			/* Convert ISO chars to UTF-8 after DB import */
-			$columns = array("post_title", "post_excerpt", "post_name", "post_content");
-			
-			foreach($columns as $col) {
 
-				$queries = array();
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€œ', '“')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€', '”')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€™', '’')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€˜', '‘')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€”', '–')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€“', '—')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€¢', '-')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â€¦', '…')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â??', '’')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'â?', '’')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'Ã©jÃ', 'é')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'Â§', '§')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'ï»¿', '')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'âS', '’S')";
-				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'Sâ', 'S’')";
-
-				foreach($queries as $query){
-					$wpdb->query($query);
-				}
-			}
-
-			//$query='DELETE FROM wp_posts WHERE post_type = "revision"';  // remove extraneous revisions
+			$wpdb->update( 'wp_options', array('option_id' => 1), array( 'option_id' => '9000' ));
+			echo(" DONE ");
 		}
 	}
+
 
 	class JigsawMetaImporter {
 
@@ -211,12 +204,10 @@ Version: 0.3
 		}
 
 		function run_queries($tid, $data){
-			//echo 'run queries for '.$tid;
 			if (!is_array($this->queries)){
 				return;
 			}
 			foreach($this->queries as $query){
-				//echo 'query!';
 				$query($tid, $data);
 			}
 		}
