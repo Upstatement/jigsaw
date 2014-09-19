@@ -94,8 +94,14 @@ Version: 0.3
 		function add_query($callback){
 			$this->queries[] = $callback;
 		}
+		
+		function set_online_only($field1, $field2){
+			$this->metas[$field1] = '1';
+			$this->metas[$field2] = 'field_52b2186804cc3';
+		}
 
 		function import($count = 10, $id = null){
+			echo " START IMPORT "
 			global $wpdb;
 			$and = '';
 			if ($id){
@@ -163,13 +169,14 @@ Version: 0.3
 				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'ï»¿', '')";
 				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'âS', '’S')";
 				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'Sâ', 'S’')";
+				$queries[] = "UPDATE wp_posts SET $col = REPLACE($col, 'Â Â Â Â Â Â', '')";
 
 				foreach($queries as $query){
 					$wpdb->query($query);
 				}
 			}
-
-			//$query='DELETE FROM wp_posts WHERE post_type = "revision"';  // remove extraneous revisions
+			$wpdb->update( 'wp_options', array('option_id' => 1), array( 'option_id' => '9000' ));
+			echo(" DONE ");
 		}
 	}
 
