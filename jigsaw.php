@@ -4,7 +4,7 @@
 	Plugin Name: Jigsaw
 	Description: Simple ways to make admin customizations for WordPress
 	Author: Jared Novack + Upstatement
-	Version: 0.4.11
+	Version: 0.5
 	Author URI: http://jigsaw.upstatement.com/
 	*/
 
@@ -248,4 +248,6 @@ class Jigsaw {
 		add_filter( 'page_row_actions', $row_action_callback, 10, 2 );
 	}
 }
+
+require_once('jigsaw-permalinks.php');
 
