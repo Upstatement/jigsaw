@@ -1,3 +1,5 @@
+<?php
+
 class JigsawPermalinks {
 
 	public static function set_author_base( $base, $with_front = true ) {
