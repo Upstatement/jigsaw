@@ -1,4 +1,5 @@
-# Jigsaw
+![Jigsaw Banner](https://cloud.githubusercontent.com/assets/1298086/5921029/e0c15824-a60e-11e4-9001-62b4e4fee1e6.jpg)
+
 Simple ways to make admin customizations for WordPress. You know all that brain space you saved for [memorizing hooks](http://wptavern.com/learn-three-wordpress-filters-a-day)? Use it for something better. For example, you can...
 
 ### Add a column to an admin page!
