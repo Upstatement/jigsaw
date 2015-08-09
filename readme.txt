@@ -2,7 +2,7 @@
 Contributors: jarednova
 Tags: admin, configuration
 Requires at least: 3.7
-Stable tag: 0.5
+Stable tag: 0.5.1
 Tested up to: 4.0
 PHP version: 5.3.0 or greater
 License: GPLv2 or later

@@ -4,8 +4,10 @@ class JigsawPermalinks {
 
 	public static function set_author_base( $base, $with_front = true ) {
 		global $wp_rewrite;
-		$wp_rewrite->author_base = $base;
-		if ( !$with_front ) {
+		if ( $wp_rewrite ) {
+			$wp_rewrite->author_base = $base;
+		}
+		if ( !$with_front && $wp_rewrite ) {
 			$wp_rewrite->author_structure = '/' . $wp_rewrite->author_base. '/%author%';
 		}
 	}
