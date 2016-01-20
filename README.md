@@ -22,6 +22,17 @@ Jigsaw::add_column(array('slides', 'post'), 'Preview', function($pid){
 });
 ```
 
+### Add a column to the users table!
+
+###### `Jigsaw::add_user_column($column_label, $callback_function, $order = 10);`
+
+```php
+Jigsaw::add_user_column('Favorite Band', function($uid){
+  	echo get_user_meta($uid, 'favorite-band', true);
+}, 5);
+```
+
+
 ### Remove a column from the admin
 
 ###### `Jigsaw::remove_column($post_types, $column_slug);`

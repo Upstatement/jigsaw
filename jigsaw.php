@@ -145,27 +145,50 @@ class Jigsaw {
 		}
 	}
 
+	public static function add_user_column( $label, $callback, $priority = 10 ) {
+		$title_filter_name = 'manage_users_columns';
+		$value_filter_name = 'manage_users_custom_column';
+
+		add_filter( $title_filter_name, function($columns) use ($label, $priority){
+			return self::column_title_filter( $columns, $label, $priority );	
+		}, $priority);
+
+		add_action( $value_filter_name, function($val, $col, $uid ) use ( $label, $callback ) {
+			$key = sanitize_title( $label );
+			if ( $col === $key ) {
+				ob_start();
+				$callback( $uid );
+				return ob_get_clean();
+			}
+		}, 10, 3);
+	}
+
+	protected static function column_title_filter( $columns, $label, $priority ) {
+		$key = sanitize_title( $label );
+		$col = array( $key => $label );
+		if ( $priority < 0 ) {
+			return array_merge( $col, $columns );
+		} else if ( $priority > count( $columns ) ) {
+			return array_merge( $columns, $col );
+		} else {
+			$offset = $priority;
+			$sorted = array_slice( $columns, 0, $offset, true ) + $col + array_slice( $columns, $offset, NULL, true );
+			return $sorted;
+		}
+	}
+
 	public static function add_column( $post_types, $label, $callback, $priority = 10 ) {
 		if ( !is_array( $post_types ) ) {
 			$post_types = array( $post_types );
 		}
 		foreach ( $post_types as $post_type ) {
 			$filter_name = 'manage_'.$post_type.'_posts_columns';
-			add_filter( $filter_name , function ( $columns ) use ( $label, $priority ) {
-					$key = sanitize_title( $label );
-					$col = array( $key => $label );
-					if ( $priority < 0 ) {
-						return array_merge( $col, $columns );
-					} else if ( $priority > count( $columns ) ) {
-						return array_merge( $columns, $col );
-					} else {
-						$offset = $priority;
-						$sorted = array_slice( $columns, 0, $offset, true ) + $col + array_slice( $columns, $offset, NULL, true );
-						return $sorted;
-					}
-				}, $priority );
+			$action_name = 'manage_'.$post_type.'_posts_custom_column';
+			add_filter( $filter_name , function($columns) use ( $label, $priority ) {
+				return self::column_title_filter( $columns, $label, $priority );		
+			}, $priority );
 
-			add_action( 'manage_'.$post_type.'_posts_custom_column', function( $col, $pid ) use ( $label, $callback ) {
+			add_action( $action_name, function( $col, $pid ) use ( $label, $callback ) {
 					$key = sanitize_title( $label );
 					if ( $col == $key ) {
 						$callback( $pid );
