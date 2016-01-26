@@ -4,7 +4,7 @@
 	Plugin Name: Jigsaw
 	Description: Simple ways to make admin customizations for WordPress
 	Author: Jared Novack + Upstatement
-	Version: 0.6
+	Version: 0.6.1
 	Author URI: http://jigsaw.upstatement.com/
 	*/
 
@@ -150,7 +150,7 @@ class Jigsaw {
 		$value_filter_name = 'manage_users_custom_column';
 
 		add_filter( $title_filter_name, function($columns) use ($label, $priority){
-			return self::column_title_filter( $columns, $label, $priority );	
+			return Jigsaw::column_title_filter( $columns, $label, $priority );	
 		}, $priority);
 
 		add_action( $value_filter_name, function($val, $col, $uid ) use ( $label, $callback ) {
@@ -185,7 +185,7 @@ class Jigsaw {
 			$filter_name = 'manage_'.$post_type.'_posts_columns';
 			$action_name = 'manage_'.$post_type.'_posts_custom_column';
 			add_filter( $filter_name , function($columns) use ( $label, $priority ) {
-				return self::column_title_filter( $columns, $label, $priority );		
+				return Jigsaw::column_title_filter( $columns, $label, $priority );		
 			}, $priority );
 
 			add_action( $action_name, function( $col, $pid ) use ( $label, $callback ) {

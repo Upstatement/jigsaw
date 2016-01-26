@@ -2,7 +2,7 @@
 Contributors: jarednova
 Tags: admin, configuration
 Requires at least: 3.7
-Stable tag: 0.6
+Stable tag: 0.6.1
 Tested up to: 4.0
 PHP version: 5.3.0 or greater
 License: GPLv2 or later
@@ -23,3 +23,11 @@ Simple ways to make admin customizations for WordPress. You know all that brain 
 == Support ==
 
 Please use the [GitHub repo](https://github.com/upstatement/jigsaw/issues?state=open) to file bugs or questions.
+
+== Changelog ==
+
+= 0.6.1 = 
+* Fixed error in PHP 5.3
+
+= 0.6 =
+* Added column support for users
