@@ -4,7 +4,7 @@
 	Plugin Name: Jigsaw
 	Description: Simple ways to make admin customizations for WordPress
 	Author: Jared Novack + Upstatement
-	Version: 0.6.1
+	Version: 0.6.2
 	Author URI: http://jigsaw.upstatement.com/
 	*/
 
@@ -163,7 +163,7 @@ class Jigsaw {
 		}, 10, 3);
 	}
 
-	protected static function column_title_filter( $columns, $label, $priority ) {
+	static function column_title_filter( $columns, $label, $priority ) {
 		$key = sanitize_title( $label );
 		$col = array( $key => $label );
 		if ( $priority < 0 ) {
