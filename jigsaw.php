@@ -8,6 +8,7 @@
 	Author URI: http://jigsaw.upstatement.com/
 	*/
 
+
 class Jigsaw {
 
 	public static function add_js( $file ) {
@@ -181,21 +182,56 @@ class Jigsaw {
 		if ( !is_array( $post_types ) ) {
 			$post_types = array( $post_types );
 		}
+		$key = sanitize_title( $label );
 		foreach ( $post_types as $post_type ) {
 			$filter_name = 'manage_'.$post_type.'_posts_columns';
 			$action_name = 'manage_'.$post_type.'_posts_custom_column';
+
 			add_filter( $filter_name , function($columns) use ( $label, $priority ) {
 				return Jigsaw::column_title_filter( $columns, $label, $priority );		
 			}, $priority );
 
-			add_action( $action_name, function( $col, $pid ) use ( $label, $callback ) {
-					$key = sanitize_title( $label );
+			add_action( $action_name, function( $col, $pid ) use ( $key, $callback ) {
 					if ( $col == $key ) {
 						$callback( $pid );
 					}
 				}, $priority, 2 );
 		}
+
 	}
+
+	public static function sort_column( $post_types, $label, $meta_key = null, $numeric = false ) {
+		if ( !is_array( $post_types ) ) {
+			$post_types = array( $post_types );
+		}
+		$key = sanitize_title( $label );
+		if ( is_null($meta_key) ) {
+			$meta_key = $key;
+		}
+		foreach ( $post_types as $post_type ) {	
+			add_filter( 'manage_edit-'.$post_type.'_sortable_columns', function($cols) use ( $key ) {
+					$cols[$key] = $key;
+					return $cols;
+			} );
+
+			add_action( 'pre_get_posts', function ( $query ) use ( $key, $meta_key, $numeric ) {
+			    if( ! is_admin() )
+			        return;
+			 
+			    $orderby = $query->get( 'orderby' );
+			 
+			    if( $key == $orderby ) {
+			        
+			        $query->set('meta_key', $meta_key );
+
+			        if ( $numeric ) {
+			        	$query->set('orderby','meta_value_num');
+			    	}
+			    }
+			});
+		}
+	}
+	
 
 	public static function add_versioning( $gitPath, $pathFromRoot = '/' ) {
 		$db = '';
