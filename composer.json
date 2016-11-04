@@ -1,0 +1,38 @@
+{
+  "name": "upstatement/jigsaw",
+  "type": "library",
+  "description": "Provides an easy API for developers to tweak the admin options of a WordPress install",
+  "keywords": [
+    "wordpress",
+    "admin",
+    "tweaks"
+  ],
+  "homepage": "http://upstatement.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jared Novack",
+      "email": "jared@upstatement.com",
+      "homepage": "http://upstatement.com"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/upstatement/jigsaw/issues",
+    "wiki": "https://github.com/upstatement/jigsaw/wiki",
+    "source": "https://github.com/upstatement/jigsaw"
+  },
+  "require": {
+    "php": ">=5.3.0",
+    "composer/installers": "~1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.0",
+    "satooshi/php-coveralls": "1.0.*"
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://wpackagist.org"
+    }
+  ]
+}
