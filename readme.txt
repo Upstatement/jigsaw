@@ -2,7 +2,7 @@
 Contributors: jarednova
 Tags: admin, configuration
 Requires at least: 3.7
-Stable tag: 0.6.2
+Stable tag: 0.7.0
 Tested up to: 4.0
 PHP version: 5.3.0 or greater
 License: GPLv2 or later
@@ -25,6 +25,9 @@ Simple ways to make admin customizations for WordPress. You know all that brain 
 Please use the [GitHub repo](https://github.com/upstatement/jigsaw/issues?state=open) to file bugs or questions.
 
 == Changelog ==
+
+= 0.7.0 = 
+* Allow for sorting of columns with meta fields
 
 = 0.6.2 = 
 * Fixed method visibility error
