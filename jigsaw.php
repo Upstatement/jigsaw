@@ -234,6 +234,35 @@ class Jigsaw {
 		}
 	}
 	
+	public static function sort_user_column( $is_meta, $label, $meta_key = null, $numeric = false ) {
+
+		$key = sanitize_title( $label );
+		if ( is_null($meta_key) ) {
+		    $meta_key = $key;
+		}
+		add_filter( 'manage_users_sortable_columns', function($cols) use ( $key ) {
+		    $cols[$key] = $key;
+		    return $cols;
+		} );
+
+		add_action( 'pre_get_users', function ( $query ) use ( $key, $meta_key, $numeric, $is_meta ) {
+		    if( ! is_admin() )
+			return;
+
+		    $orderby = $query->get( 'orderby' );
+
+		    if( $is_meta &&  $key == $orderby ) {
+
+			$query->set('meta_key', $meta_key );
+
+			if ( $numeric ) {
+			    $query->set('orderby','meta_value_num');
+			}
+		    } else if($key == $orderby) {
+			$query->set('orderby', $meta_key);
+		    }
+		});
+	}
 
 	public static function add_versioning( $gitPath, $pathFromRoot = '/' ) {
 		$db = '';
