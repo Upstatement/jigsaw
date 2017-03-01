@@ -160,6 +160,8 @@ class Jigsaw {
 				ob_start();
 				$callback( $uid );
 				return ob_get_clean();
+			} else {
+				return $val;
 			}
 		}, 10, 3);
 	}
