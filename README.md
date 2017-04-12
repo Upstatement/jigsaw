@@ -92,7 +92,15 @@ Jigsaw::show_notice('Error flushing cache, is the plugin activated?', 'error');
 Jigsaw::add_css('css/my-admin-style.css');
 ```
 
-#JigsawPermalinks
+### Add a JS file to the admin
+
+###### `Jigsaw::add_js($css_file);`
+
+```php
+Jigsaw::add_js('js/my-admin-script.js');
+```
+
+# JigsawPermalinks
 
 ### Set the base of the author permalink
 
