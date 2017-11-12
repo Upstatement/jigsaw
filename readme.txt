@@ -2,7 +2,7 @@
 Contributors: jarednova
 Tags: admin, configuration
 Requires at least: 3.7
-Stable tag: 0.8.0
+Stable tag: 0.8.1
 Tested up to: 4.7.3
 PHP version: 5.3.0 or greater
 License: GPLv2 or later
@@ -25,6 +25,9 @@ Simple ways to make admin customizations for WordPress. You know all that brain 
 Please use the [GitHub repo](https://github.com/upstatement/jigsaw/issues?state=open) to file bugs or questions.
 
 == Changelog ==
+
+= 0.8.1 =
+* Updating and fixing links in readme, examples
 
 = 0.8.0
 * Bring the same amazing sorting functionality to user fields (thanks @arenddeboer)
