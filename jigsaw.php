@@ -211,8 +211,8 @@ class Jigsaw {
 			$meta_key = $key;
 		}
 		foreach ( $post_types as $post_type ) {	
-			add_filter( 'manage_edit-'.$post_type.'_sortable_columns', function($cols) use ( $key ) {
-					$cols[$key] = $key;
+			add_filter( 'manage_edit-'.$post_type.'_sortable_columns', function($cols) use ( $key, $meta_key ) { 
+					$cols[$key] = $meta_key;
 					return $cols;
 			} );
 
