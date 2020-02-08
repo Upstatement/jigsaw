@@ -26,6 +26,9 @@ Please use the [GitHub repo](https://github.com/upstatement/jigsaw/issues?state=
 
 == Changelog ==
 
+= 0.9.1 =
+* Automate deployment to WordPress.org with new GitHub action
+
 = 0.9.0 =
 * Allow for sorting of columns #6 (thanks @shadowshades)
 
