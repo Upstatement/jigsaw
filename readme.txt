@@ -32,7 +32,7 @@ Please use the [GitHub repo](https://github.com/upstatement/jigsaw/issues?state=
 = 0.8.1 =
 * Updating and fixing links in readme, examples
 
-= 0.8.0
+= 0.8.0 =
 * Bring the same amazing sorting functionality to user fields (thanks @arenddeboer)
 
 = 0.7.0 = 
